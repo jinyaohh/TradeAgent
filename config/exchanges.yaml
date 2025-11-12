@@ -1,0 +1,205 @@
+# Exchange and Broker Configuration
+
+# Cryptocurrency Exchanges
+crypto:
+  # Binance Configuration
+  binance:
+    enabled: true
+    testnet: true  # Use testnet for testing
+    exchange_id: binance
+    ccxt_config:
+      enableRateLimit: true
+      rateLimit: 50
+      timeout: 30000
+    trading_pairs:
+      - BTC/USDT
+      - ETH/USDT
+      - BNB/USDT
+      - SOL/USDT
+      - ADA/USDT
+    timeframes:
+      - 1m
+      - 5m
+      - 15m
+      - 1h
+      - 4h
+      - 1d
+    fees:
+      maker: 0.001  # 0.1%
+      taker: 0.001  # 0.1%
+
+  # Coinbase Pro Configuration
+  coinbase:
+    enabled: false
+    exchange_id: coinbasepro
+    ccxt_config:
+      enableRateLimit: true
+      rateLimit: 100
+      timeout: 30000
+    trading_pairs:
+      - BTC/USD
+      - ETH/USD
+      - SOL/USD
+    fees:
+      maker: 0.004  # 0.4%
+      taker: 0.006  # 0.6%
+
+  # Kraken Configuration
+  kraken:
+    enabled: false
+    exchange_id: kraken
+    ccxt_config:
+      enableRateLimit: true
+      rateLimit: 100
+      timeout: 30000
+    trading_pairs:
+      - BTC/USD
+      - ETH/USD
+    fees:
+      maker: 0.0016  # 0.16%
+      taker: 0.0026  # 0.26%
+
+# Stock Brokers
+stocks:
+  # Alpaca Configuration
+  alpaca:
+    enabled: true
+    paper: true  # Paper trading mode
+    base_url: https://paper-api.alpaca.markets
+    data_url: https://data.alpaca.markets
+    websocket_url: wss://stream.data.alpaca.markets
+
+    # Trading configuration
+    symbols:
+      # Tech stocks
+      - AAPL
+      - MSFT
+      - GOOGL
+      - AMZN
+      - META
+      - NVDA
+      - TSLA
+      # Finance
+      - JPM
+      - BAC
+      - GS
+      # ETFs
+      - SPY
+      - QQQ
+      - IWM
+
+    timeframes:
+      - 1Min
+      - 5Min
+      - 15Min
+      - 1Hour
+      - 1Day
+
+    order_types:
+      - market
+      - limit
+      - stop
+      - stop_limit
+      - trailing_stop
+
+    # Account settings
+    account_type: cash  # cash, margin
+    allow_fractional_shares: false
+    extended_hours: false
+
+    fees:
+      commission: 0.0  # Alpaca is commission-free
+      per_share: 0.0
+
+  # Interactive Brokers Configuration (Future)
+  interactive_brokers:
+    enabled: false
+    account_type: paper
+    host: 127.0.0.1
+    port: 7497  # 7497 for paper, 7496 for live
+    client_id: 1
+
+    symbols:
+      - SPY
+      - QQQ
+
+    fees:
+      commission_per_share: 0.0035  # $0.0035 per share
+      minimum_commission: 0.35      # $0.35 minimum
+
+# Common Exchange Settings
+common:
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    burst_limit: 10
+
+  # Retry configuration
+  retry:
+    max_attempts: 3
+    initial_delay: 1  # seconds
+    max_delay: 10     # seconds
+    exponential_backoff: true
+
+  # Timeout configuration
+  timeout:
+    connect: 10  # seconds
+    read: 30     # seconds
+
+  # Data fetching
+  data:
+    cache_enabled: true
+    cache_ttl: 60  # seconds
+    max_candles: 1000
+    historical_data_days: 365
+
+  # Order execution
+  orders:
+    default_type: limit
+    default_time_in_force: gtc  # gtc, ioc, fok
+    fill_timeout: 300  # seconds
+    partial_fills_allowed: true
+
+  # Websocket configuration
+  websocket:
+    enabled: true
+    auto_reconnect: true
+    ping_interval: 30  # seconds
+    max_reconnect_attempts: 5
+
+# Market Hours (for stocks)
+market_hours:
+  us_equity:
+    timezone: America/New_York
+    regular:
+      open: "09:30"
+      close: "16:00"
+    extended:
+      pre_market_open: "04:00"
+      pre_market_close: "09:30"
+      after_hours_open: "16:00"
+      after_hours_close: "20:00"
+    trading_days:
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+
+# Data Sources (for additional data)
+data_sources:
+  # Price data
+  yahoo_finance:
+    enabled: true
+    use_for_backtesting: true
+
+  # Fundamental data
+  alpha_vantage:
+    enabled: false
+    api_key: null
+
+  # News data
+  news_api:
+    enabled: false
+    api_key: null

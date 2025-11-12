@@ -1,0 +1,105 @@
+# Risk Management Configuration
+
+risk:
+  # Position Level Risk
+  max_risk_per_trade: 0.02      # 2% - Maximum risk per single trade
+  min_risk_reward_ratio: 1.5    # Minimum 1.5:1 risk/reward
+  position_size_method: risk_pct # risk_pct, fixed_pct, kelly, fixed_amount
+  min_position_size: 100.0      # Minimum position size in USD
+  max_position_size_pct: 0.10   # Max 10% of portfolio per position
+
+  # Portfolio Level Risk
+  max_portfolio_risk: 0.10      # 10% - Maximum total portfolio risk
+  max_positions: 5              # Maximum concurrent open positions
+  max_correlated_positions: 2   # Max positions in correlated assets
+  correlation_threshold: 0.7    # Correlation threshold (0-1)
+
+  # Loss Limits
+  daily_loss_limit: 0.05        # 5% - Auto-pause trading for the day
+  weekly_loss_limit: 0.10       # 10% - Review required to resume
+  monthly_loss_limit: 0.15      # 15% - Manual intervention required
+  max_drawdown: 0.15            # 15% - Emergency stop all trading
+
+  # Consecutive Loss Limits
+  max_consecutive_losses: 3     # Auto-pause after 3 consecutive losses
+  pause_duration_minutes: 60    # Duration to pause after consecutive losses
+
+  # Stop Loss Configuration
+  stop_loss:
+    type: atr  # fixed_pct, fixed_amount, atr, trailing
+    fixed_pct: 0.02             # 2% for fixed percentage
+    atr_multiplier: 2.0         # 2x ATR for volatility-based stops
+    atr_period: 14              # Period for ATR calculation
+    trailing_pct: 0.03          # 3% for trailing stops
+    trailing_activation: 0.02   # Activate trailing after 2% profit
+
+  # Take Profit Configuration
+  take_profit:
+    enabled: true
+    type: risk_reward  # fixed_pct, fixed_amount, risk_reward
+    fixed_pct: 0.04             # 4% for fixed percentage
+    risk_reward_ratio: 2.0      # 2:1 risk/reward ratio
+    partial_profit_enabled: true
+    partial_profit_pct: 0.50    # Take 50% profit at first target
+
+  # Time-Based Exits
+  time_exits:
+    enabled: false
+    max_hold_time_hours: 168    # 7 days maximum hold time
+    close_before_weekend: false # Close all positions before weekend
+    close_before_news: false    # Close before major news events
+
+# Asset-Specific Risk Settings
+asset_risk:
+  crypto:
+    max_risk_per_trade: 0.02    # 2% - Crypto can be volatile
+    max_leverage: 1.0           # No leverage (1x = cash account)
+    max_portfolio_allocation: 0.50  # Max 50% of portfolio in crypto
+
+  stocks:
+    max_risk_per_trade: 0.015   # 1.5% - Slightly lower for stocks
+    max_leverage: 1.0           # No leverage
+    max_portfolio_allocation: 0.50  # Max 50% of portfolio in stocks
+
+    # Stock-specific rules
+    penny_stock_threshold: 5.0  # Price below this = penny stock
+    allow_penny_stocks: false   # Don't trade penny stocks
+    min_avg_volume: 100000      # Minimum average daily volume
+
+# Market Condition Adjustments
+market_conditions:
+  high_volatility:
+    vix_threshold: 30           # VIX above 30 = high volatility
+    reduce_position_size: 0.50  # Reduce position size by 50%
+    widen_stops: 1.5            # Widen stops by 1.5x
+
+  low_liquidity:
+    min_volume_threshold: 50000 # Skip if volume below threshold
+    widen_bid_ask: 0.02         # Skip if spread > 2%
+
+# Risk Monitoring
+monitoring:
+  check_interval: 60            # Check risk limits every 60 seconds
+  alert_threshold: 0.80         # Alert when 80% of limit reached
+  auto_close_on_breach: true    # Auto-close positions if limits breached
+  emergency_stop_enabled: true  # Enable emergency stop functionality
+
+# Pre-Trade Risk Checks (All must pass)
+pre_trade_checks:
+  - check_max_positions
+  - check_position_size
+  - check_portfolio_risk
+  - check_daily_loss_limit
+  - check_correlation
+  - check_asset_allocation
+  - check_liquidity
+  - check_risk_reward_ratio
+
+# Post-Trade Monitoring (Continuous)
+post_trade_checks:
+  - monitor_stop_loss
+  - monitor_take_profit
+  - monitor_trailing_stop
+  - monitor_max_hold_time
+  - monitor_drawdown
+  - monitor_portfolio_risk

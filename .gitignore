@@ -1,0 +1,111 @@
+# TradeAgent .gitignore
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Data & Databases
+data/
+*.db
+*.sqlite
+*.sqlite3
+user_data/
+
+# FreqTrade Specific
+freqtrade_config/user_data/data/
+freqtrade_config/user_data/logs/
+freqtrade_config/user_data/backtest_results/
+freqtrade_config/user_data/plot/
+freqtrade_config/user_data/notebooks/
+
+# Backtest Results
+backtest_results/
+*.html
+*.csv
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Cache
+.cache/
+*.pkl
+*.pickle
+
+# OS Files
+Thumbs.db
+.directory
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# Documentation Build
+docs/_build/
+site/
+
+# Local Configuration (keep templates, ignore actual configs with secrets)
+config/local_*.yaml
+config/production_*.yaml
+
+# Trading Data (sensitive)
+trades_history/
+portfolio_snapshots/

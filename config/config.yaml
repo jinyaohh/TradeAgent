@@ -1,0 +1,62 @@
+# TradeAgent Main Configuration
+# Values here can be overridden by environment variables
+
+system:
+  environment: development  # development, staging, production
+  log_level: INFO          # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  timezone: America/New_York
+  debug_mode: false
+  cache_enabled: true
+  cache_ttl: 300  # seconds
+
+trading:
+  mode: paper             # paper, live
+  crypto_enabled: true
+  stocks_enabled: true
+  initial_capital: 10000.0
+
+portfolio:
+  rebalance_enabled: false
+  rebalance_frequency: weekly  # daily, weekly, monthly
+  target_allocation:
+    crypto: 0.50  # 50%
+    stocks: 0.40  # 40%
+    cash: 0.10    # 10%
+
+database:
+  url: sqlite:///tradeagent.db
+  echo: false  # Log SQL queries
+  pool_size: 5
+  max_overflow: 10
+
+dashboard:
+  port: 8501
+  host: localhost
+  auto_refresh: true
+  refresh_interval: 5  # seconds
+
+notifications:
+  telegram:
+    enabled: false
+  email:
+    enabled: false
+  webhook:
+    enabled: false
+
+api:
+  rate_limit_enabled: true
+  max_requests_per_minute: 60
+  timeout: 30  # seconds
+  retry_attempts: 3
+  retry_delay: 2  # seconds
+
+performance:
+  workers: 4
+  max_concurrent_orders: 3
+  enable_multiprocessing: false
+
+monitoring:
+  metrics_enabled: true
+  health_check_interval: 60  # seconds
+  save_snapshots: true
+  snapshot_interval: 3600  # seconds (1 hour)

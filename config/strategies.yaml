@@ -1,0 +1,228 @@
+# Trading Strategies Configuration
+
+# Global Strategy Settings
+global:
+  enabled_strategies:
+    crypto:
+      - rsi_strategy
+    stocks:
+      - rsi_strategy
+      - ma_crossover
+
+  default_timeframe: 1h
+  min_confidence: 0.6  # Minimum confidence score (0-1)
+
+  # Strategy rotation
+  rotation_enabled: false
+  rotation_period_days: 7  # Switch strategies every 7 days based on performance
+
+# Strategy Definitions
+
+strategies:
+  # RSI Mean Reversion Strategy
+  rsi_strategy:
+    name: "RSI Mean Reversion"
+    description: "Buy oversold, sell overbought based on RSI"
+    enabled: true
+    asset_classes:
+      - crypto
+      - stocks
+
+    parameters:
+      # RSI Settings
+      rsi_period: 14
+      rsi_oversold: 30    # Buy signal
+      rsi_overbought: 70  # Sell signal
+      rsi_extreme_oversold: 20  # Strong buy
+      rsi_extreme_overbought: 80  # Strong sell
+
+      # Entry Conditions
+      entry:
+        rsi_below: 30
+        volume_confirmation: true
+        volume_multiplier: 1.2  # Volume must be 1.2x average
+
+      # Exit Conditions
+      exit:
+        rsi_above: 70
+        profit_target_pct: 0.04  # 4% profit target
+        stop_loss_pct: 0.02      # 2% stop loss
+
+      # Additional Filters
+      filters:
+        trend_filter: false  # Don't use trend filter
+        volatility_filter: false
+
+  # Moving Average Crossover Strategy
+  ma_crossover:
+    name: "MA Crossover"
+    description: "Trend following with MA crossovers"
+    enabled: true
+    asset_classes:
+      - crypto
+      - stocks
+
+    parameters:
+      # Moving Average Settings
+      fast_ma_period: 50
+      slow_ma_period: 200
+      ma_type: EMA  # SMA, EMA, WMA
+
+      # Entry Conditions
+      entry:
+        signal: golden_cross  # golden_cross = fast MA crosses above slow MA
+        volume_confirmation: true
+        volume_multiplier: 1.5
+        momentum_confirmation: true  # Require positive momentum
+
+      # Exit Conditions
+      exit:
+        signal: death_cross  # death_cross = fast MA crosses below slow MA
+        trailing_stop_pct: 0.03  # 3% trailing stop
+        profit_target_pct: 0.08  # 8% profit target
+
+      # Filters
+      filters:
+        min_trend_strength: 0.6  # ADX or similar
+        avoid_choppy_market: true
+
+  # Momentum Strategy
+  momentum_strategy:
+    name: "Momentum Breakout"
+    description: "Trade momentum breakouts with volume confirmation"
+    enabled: false  # Disabled by default
+    asset_classes:
+      - crypto
+      - stocks
+
+    parameters:
+      # Lookback period
+      lookback_period: 20
+
+      # Breakout Settings
+      breakout:
+        method: high_break  # high_break, volatility_break
+        confirmation_candles: 2  # Wait for 2 candles above breakout
+        atr_multiplier: 1.5      # For volatility breakouts
+
+      # Volume Confirmation
+      volume:
+        required: true
+        min_multiplier: 2.0  # Volume must be 2x average
+
+      # Entry
+      entry:
+        wait_for_pullback: false
+        pullback_pct: 0.02  # Enter on 2% pullback
+
+      # Exit
+      exit:
+        method: trailing_stop
+        trailing_stop_pct: 0.05  # 5% trailing stop
+        profit_target_pct: 0.10  # 10% target
+        max_hold_days: 10
+
+  # Bollinger Band Strategy
+  bollinger_bands:
+    name: "Bollinger Band Bounce"
+    description: "Trade bounces off Bollinger Bands"
+    enabled: false
+    asset_classes:
+      - crypto
+      - stocks
+
+    parameters:
+      # Bollinger Band Settings
+      bb_period: 20
+      bb_std: 2.0  # Standard deviations
+
+      # Entry
+      entry:
+        signal: lower_band_touch
+        rsi_confirmation: true
+        rsi_threshold: 40  # RSI must be below 40
+
+      # Exit
+      exit:
+        signal: middle_band_touch
+        upper_band_exit: true
+        stop_loss_pct: 0.03
+
+  # MACD Strategy
+  macd_strategy:
+    name: "MACD Crossover"
+    description: "Trade MACD signal crossovers"
+    enabled: false
+    asset_classes:
+      - crypto
+      - stocks
+
+    parameters:
+      # MACD Settings
+      fast_period: 12
+      slow_period: 26
+      signal_period: 9
+
+      # Entry
+      entry:
+        signal: bullish_cross  # MACD crosses above signal
+        histogram_positive: true
+        price_above_ema: true
+        ema_period: 200
+
+      # Exit
+      exit:
+        signal: bearish_cross
+        trailing_stop_pct: 0.04
+        take_profit_pct: 0.06
+
+# Backtesting Configuration
+backtesting:
+  start_date: "2023-01-01"
+  end_date: "2024-01-01"
+  initial_capital: 10000.0
+  commission: 0.001  # 0.1%
+  slippage: 0.0005   # 0.05%
+
+  # Walk-forward analysis
+  walk_forward:
+    enabled: false
+    train_period_months: 6
+    test_period_months: 1
+    step_months: 1
+
+# Paper Trading
+paper_trading:
+  enabled: true
+  initial_capital: 10000.0
+  track_slippage: true
+  simulate_latency: true
+  latency_ms: 100
+
+# Strategy Performance Tracking
+performance:
+  # Minimum metrics to keep strategy enabled
+  min_win_rate: 0.45           # 45%
+  min_profit_factor: 1.2       # 1.2:1
+  min_sharpe_ratio: 0.5
+  max_drawdown_pct: 0.20       # 20%
+
+  # Auto-disable strategy if underperforming
+  auto_disable: true
+  evaluation_period_days: 30
+  min_trades_for_evaluation: 20
+
+# Strategy Combination
+combination:
+  enabled: false
+  method: portfolio  # portfolio, signal_aggregation
+
+  # Portfolio method: allocate capital across strategies
+  portfolio:
+    equal_weight: true
+    rebalance_frequency: weekly
+
+  # Signal aggregation: combine signals from multiple strategies
+  signal_aggregation:
+    method: voting  # voting, weighted_average
+    min_agreements: 2  # Need 2 strategies to agree
