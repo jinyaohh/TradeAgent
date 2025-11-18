@@ -216,11 +216,17 @@ class SimpleBacktest:
         if not self.trades:
             return {
                 'total_trades': 0,
+                'winning_trades': 0,
+                'losing_trades': 0,
                 'final_equity': self.capital,
+                'initial_capital': self.initial_capital,
                 'total_return': 0.0,
                 'win_rate': 0.0,
                 'avg_profit': 0.0,
-                'max_drawdown': 0.0
+                'avg_win': 0.0,
+                'avg_loss': 0.0,
+                'max_drawdown': 0.0,
+                'profit_factor': 0.0
             }
 
         # Basic metrics
