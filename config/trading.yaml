@@ -1,0 +1,152 @@
+# TradeAgent Main Configuration
+# This file controls the trading engine and all subsystems
+
+# Trading Mode
+# - paper: Paper trading (simulated, no real money)
+# - live: Live trading (REAL MONEY - use with extreme caution!)
+mode: paper
+
+# Initial Capital (USD)
+initial_capital: 10000.0
+
+# Bot Configuration
+crypto_enabled: true   # Enable crypto trading bot
+stock_enabled: true    # Enable stock trading bot
+
+# Update Intervals (seconds)
+monitor_interval: 60    # Risk monitoring check interval
+crypto_interval: 300    # Crypto bot execution interval (5 minutes)
+stock_interval: 300     # Stock bot execution interval (5 minutes)
+
+# Notification Configuration
+notifications:
+  console_enabled: true           # Always show console output
+  telegram_enabled: false         # Enable Telegram notifications
+  telegram_bot_token: ""          # Set via environment variable TELEGRAM_BOT_TOKEN
+  telegram_chat_id: ""            # Set via environment variable TELEGRAM_CHAT_ID
+  email_enabled: false            # Enable email notifications
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+  smtp_user: ""                   # Set via environment variable SMTP_USER
+  smtp_password: ""               # Set via environment variable SMTP_PASSWORD
+  email_to: ""                    # Set via environment variable EMAIL_TO
+  max_history: 100                # Keep last N notifications in memory
+
+# Risk Management Configuration
+risk:
+  # Position Sizing
+  max_risk_per_trade: 0.02        # 2% max risk per trade
+  max_position_pct: 0.10          # 10% max position size (of portfolio)
+
+  # Position Limits
+  max_open_positions: 10          # Maximum number of concurrent positions
+  max_position_size_pct: 0.20     # 20% max per single position
+  max_single_asset_pct: 0.30      # 30% max concentration in single asset
+
+  # Asset Class Limits
+  max_crypto_pct: 0.50            # 50% max in crypto assets
+  max_stock_pct: 0.80             # 80% max in stock assets
+
+  # Loss Limits
+  max_daily_loss_pct: 0.05        # 5% max loss per day
+  max_drawdown_pct: 0.20          # 20% max drawdown from peak
+  max_rapid_loss_pct: 0.03        # 3% rapid loss (in 1 hour) triggers halt
+  max_rapid_loss_minutes: 60      # Time window for rapid loss detection
+
+  # Cash Management
+  min_cash_reserve_pct: 0.15      # Keep 15% minimum in cash
+  max_leverage: 1.0               # No leverage (1.0 = cash only)
+
+  # Emergency Controls
+  auto_resume_enabled: false      # Don't auto-resume after halt
+  halt_duration_minutes: 60       # Stay halted for 1 hour
+  emergency_liquidate_losers: true  # Close losing positions in emergency
+
+# Crypto Bot Configuration
+crypto:
+  # Exchange
+  exchange: binance               # Exchange to use (binance, coinbase, kraken)
+  testnet: true                   # Use testnet for paper trading
+
+  # Trading Pairs
+  symbols:
+    - BTC/USDT
+    - ETH/USDT
+    - BNB/USDT
+
+  # Strategy
+  strategy: rsi                   # Strategy to use (rsi, macd, etc.)
+
+  # Strategy Parameters (RSI)
+  rsi_period: 14
+  rsi_oversold: 30
+  rsi_overbought: 70
+  stop_loss_pct: 0.02            # 2% stop loss
+  take_profit_pct: 0.04          # 4% take profit
+
+# Stock Bot Configuration
+stock:
+  # Broker
+  broker: alpaca                  # Broker to use (alpaca, ibkr, etc.)
+  paper_trading: true             # Use paper trading account
+
+  # Trading Symbols
+  symbols:
+    - AAPL
+    - GOOGL
+    - MSFT
+    - TSLA
+    - NVDA
+
+  # Strategy
+  strategy: rsi                   # Strategy to use (rsi, ma_crossover, etc.)
+
+  # Strategy Parameters (RSI)
+  rsi_period: 14
+  rsi_oversold: 25               # Tighter for stocks
+  rsi_overbought: 75
+  stop_loss_pct: 0.015           # 1.5% stop loss
+  take_profit_pct: 0.03          # 3% take profit
+
+# Backtesting Configuration (for testing strategies)
+backtest:
+  start_date: "2024-01-01"
+  end_date: "2024-12-31"
+  initial_capital: 10000.0
+  commission: 0.001              # 0.1% commission
+  slippage: 0.0005               # 0.05% slippage
+
+# Logging Configuration
+logging:
+  level: INFO                    # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_enabled: true
+  file_path: logs/tradeagent.log
+  max_file_size_mb: 10
+  backup_count: 5
+  console_enabled: true
+
+# Database Configuration (for trade history)
+database:
+  enabled: false                 # Enable database storage
+  type: sqlite                   # sqlite, postgresql, mysql
+  path: data/tradeagent.db       # For SQLite
+  # For PostgreSQL/MySQL:
+  # host: localhost
+  # port: 5432
+  # database: tradeagent
+  # username: ""
+  # password: ""
+
+# Performance Monitoring
+monitoring:
+  dashboard_enabled: true
+  dashboard_port: 8501
+  metrics_interval: 60           # Update metrics every 60 seconds
+  save_state_interval: 300       # Save state every 5 minutes
+
+# Development/Debug Settings
+debug:
+  enabled: false
+  verbose_logging: false
+  dry_run: false                 # If true, don't execute real trades (even in paper mode)
+  mock_data: false               # Use mock data instead of real market data

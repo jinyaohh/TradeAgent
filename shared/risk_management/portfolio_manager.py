@@ -334,6 +334,7 @@ class PortfolioManager:
             'total_value': total_value,
             'cash': self.cash,
             'positions_value': positions_value,
+            'total_invested': positions_value,  # Alias for positions_value
             'initial_capital': self.initial_capital,
 
             # Allocation
