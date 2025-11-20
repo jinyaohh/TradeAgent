@@ -1,7 +1,14 @@
 """
 Crypto Trading Bot
 
+Custom implementation of cryptocurrency trading bot.
 Executes crypto trading strategies using the strategy framework.
+
+Note: This is a custom lightweight implementation. The system also supports
+FreqTrade integration for users who prefer the battle-tested FreqTrade framework.
+Install FreqTrade with: pip install freqtrade ccxt
+
+See docs/ARCHITECTURE.md for details on both implementations.
 """
 
 import time

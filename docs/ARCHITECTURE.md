@@ -2,7 +2,9 @@
 
 ## 🎯 System Overview
 
-TradeAgent is a hybrid algorithmic trading system that supports both cryptocurrency and stock trading for personal use. The system leverages FreqTrade for crypto trading while implementing a custom stock trading module, unified through shared risk management and portfolio management layers.
+TradeAgent is a hybrid algorithmic trading system that supports both cryptocurrency and stock trading for personal use. The system was originally designed to leverage FreqTrade for crypto trading and includes a custom stock trading module. Both modules are unified through shared risk management and portfolio management layers.
+
+**Implementation Note:** The system includes a custom CryptoBot implementation (Phases 2-3) that provides crypto trading capabilities. FreqTrade can be optionally installed and integrated for users who prefer the battle-tested FreqTrade framework. Both approaches are supported by the architecture.
 
 ---
 
@@ -17,7 +19,7 @@ TradeAgent is a hybrid algorithmic trading system that supports both cryptocurre
                     │                           │
          ┌──────────▼──────────┐    ┌──────────▼──────────┐
          │   CRYPTO MODULE     │    │   STOCK MODULE      │
-         │   (FreqTrade)       │    │   (Custom)          │
+         │ (Custom/FreqTrade)  │    │   (Custom)          │
          └──────────┬──────────┘    └──────────┬──────────┘
                     │                           │
                     └─────────────┬─────────────┘
@@ -37,14 +39,31 @@ TradeAgent is a hybrid algorithmic trading system that supports both cryptocurre
 
 ## 📦 Component Architecture
 
-### 1. **Crypto Trading Module (FreqTrade Integration)**
+### 1. **Crypto Trading Module (Custom + FreqTrade Compatible)**
 
-**Purpose:** Handle all cryptocurrency trading operations using the battle-tested FreqTrade framework.
+**Purpose:** Handle all cryptocurrency trading operations with flexible implementation options.
 
+**Implementation Options:**
+
+#### Option A: Custom CryptoBot (Current Implementation - Phases 2-3)
+```python
+core/crypto_bot.py          # Custom crypto trading bot
+cryptobot/strategies/       # Custom strategy implementations
+cryptobot/data/            # Mock data generators
+```
+
+**Features:**
+- Lightweight custom implementation
+- Integrated with shared risk management (Phase 4)
+- Works with Phase 8 exchange connectors
+- RSI, MA Crossover, and custom strategies
+- Full integration with portfolio manager
+
+#### Option B: FreqTrade Integration (Optional - Available)
 **Components:**
-- **FreqTrade Core:** Main trading engine (used as dependency)
-- **Strategy Layer:** Custom trading strategies
-- **Exchange Connectors:** Via CCXT library (Binance, Coinbase, etc.)
+- **FreqTrade Core:** Battle-tested trading engine (install via pip)
+- **Strategy Layer:** Use FreqTrade's extensive strategy library
+- **Exchange Connectors:** Via CCXT library (100+ exchanges)
 - **Data Provider:** Real-time and historical crypto market data
 
 **Key Features:**
@@ -53,6 +72,18 @@ TradeAgent is a hybrid algorithmic trading system that supports both cryptocurre
 - Built-in backtesting
 - Paper trading mode
 - Telegram bot integration
+- Large community support
+
+**Installation:**
+```bash
+pip install freqtrade ccxt
+```
+
+**Both implementations:**
+- Use the same shared risk management (Phase 4)
+- Connect to the same portfolio manager
+- Support the same exchanges (Binance, Coinbase, etc.)
+- Integrate with notification system (Phase 5)
 
 ---
 

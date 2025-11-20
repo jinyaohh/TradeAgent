@@ -21,6 +21,7 @@ A professional algorithmic trading system supporting both cryptocurrency and sto
 TradeAgent is a complete algorithmic trading platform with:
 
 - **Multi-Asset Trading:** Crypto (Binance) and stocks (Alpaca)
+- **Flexible Crypto Implementation:** Custom CryptoBot + FreqTrade compatible
 - **Advanced Backtesting:** Walk-forward analysis, Monte Carlo simulation, 40+ metrics
 - **Risk Management:** Position sizing, stop losses, portfolio limits, circuit breakers
 - **Real-Time Monitoring:** Web dashboard and multi-channel notifications
@@ -90,6 +91,8 @@ python main.py stop
 
 ### Trading Capabilities
 ✅ Cryptocurrency trading (Binance, testnet & live)
+✅ Custom CryptoBot implementation (lightweight, integrated)
+✅ FreqTrade compatible (optional - install for advanced features)
 ✅ Stock trading (Alpaca, US markets)
 ✅ Multiple strategies (RSI, MA Crossover, Momentum)
 ✅ Paper trading mode for safe testing
@@ -236,9 +239,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [FreqTrade](https://www.freqtrade.io/) - Inspiration for crypto trading framework
+- [FreqTrade](https://www.freqtrade.io/) - Architecture inspiration and optional integration for crypto trading
 - [Alpaca](https://alpaca.markets/) - Commission-free stock trading API
 - [Binance](https://www.binance.com/) - Cryptocurrency exchange
+- [CCXT](https://github.com/ccxt/ccxt) - Cryptocurrency exchange integration library
 - All open-source contributors in the algo trading community
 
 ## 📚 Learning Resources

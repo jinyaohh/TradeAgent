@@ -23,6 +23,21 @@ python-dateutil>=2.8.2
 pytz>=2023.3
 
 # ==========================================
+# PHASE 2-3: CRYPTO TRADING
+# ==========================================
+
+# FreqTrade - Battle-tested crypto trading framework
+# Original architecture planned FreqTrade for crypto trading
+# System also includes custom CryptoBot for flexibility
+# Optional: Install if you want to use FreqTrade features
+# freqtrade>=2024.1
+
+# CCXT - Cryptocurrency exchange library (used by FreqTrade and custom bots)
+# Optional but recommended for crypto trading
+# System falls back to mock connector if not installed
+# ccxt>=4.2.0
+
+# ==========================================
 # PHASE 3-4: TECHNICAL ANALYSIS & INDICATORS
 # ==========================================
 
@@ -78,11 +93,6 @@ pytest-asyncio>=0.21.1
 # ==========================================
 # PHASE 8: EXCHANGE & BROKER INTEGRATION
 # ==========================================
-
-# Optional: Cryptocurrency Exchange Integration
-# Install if using Binance or other crypto exchanges
-# System falls back to mock connector if not installed
-# ccxt>=4.2.0
 
 # Optional: Stock Broker Integration
 # Install if using Alpaca for stock trading
@@ -150,6 +160,9 @@ pytest-asyncio>=0.21.1
 # Full Installation (All features):
 #   pip install -r requirements.txt
 #   # Then uncomment and install optional packages as needed
+#
+# With FreqTrade (crypto trading framework):
+#   pip install freqtrade ccxt
 #
 # With Exchange Connectors:
 #   pip install ccxt alpaca-trade-api
