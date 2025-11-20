@@ -653,6 +653,105 @@ momentum:
 
 **Best For:** Volatile, trending markets
 
+### Using FreqTrade Strategies (Optional)
+
+TradeAgent supports two crypto trading implementations:
+
+#### Custom CryptoBot (Default)
+- Lightweight and integrated
+- Simple to use and modify
+- Good for learning and customization
+- Strategies in `cryptobot/strategies/`
+
+#### FreqTrade Integration (Optional)
+- Battle-tested trading engine
+- 100+ exchanges supported via CCXT
+- Large community and strategy library
+- Advanced features (hyperopt, edge positioning)
+- Strategies in `freqtrade_strategies/`
+
+#### Switching to FreqTrade
+
+1. **Install FreqTrade:**
+   ```bash
+   pip install freqtrade ccxt
+   ```
+
+2. **Configure in `config/trading.yaml`:**
+   ```yaml
+   crypto_bot_type: freqtrade
+
+   crypto:
+     # Exchange settings
+     exchange: binance
+     testnet: true
+     symbols:
+       - BTC/USDT
+       - ETH/USDT
+
+     # FreqTrade-specific settings
+     freqtrade_strategy: SampleStrategy
+     freqtrade_strategy_path: freqtrade_strategies
+   ```
+
+3. **Start trading:**
+   ```bash
+   python main.py start
+   ```
+
+#### Key Benefits of Integration
+
+✅ **Unified Portfolio Management**: All positions (crypto + stocks) tracked in one place
+✅ **Unified Risk Management**: TradeAgent's risk rules apply to FreqTrade trades
+✅ **Unified Notifications**: All alerts go through TradeAgent's notification system
+✅ **Unified Dashboard**: View everything in one dashboard
+
+#### Creating FreqTrade Strategies
+
+Create new strategies in `freqtrade_strategies/` following FreqTrade's IStrategy interface:
+
+```python
+from freqtrade.strategy import IStrategy
+import pandas as pd
+
+class MyFreqTradeStrategy(IStrategy):
+    # Strategy settings
+    timeframe = '5m'
+    stoploss = -0.02
+    minimal_roi = {"0": 0.04}
+
+    def populate_indicators(self, dataframe: pd.DataFrame, metadata: dict):
+        # Add your indicators
+        dataframe['rsi'] = ta.RSI(dataframe['close'], 14)
+        return dataframe
+
+    def populate_entry_trend(self, dataframe: pd.DataFrame, metadata: dict):
+        # Define entry signals
+        dataframe.loc[dataframe['rsi'] < 30, 'enter_long'] = 1
+        return dataframe
+
+    def populate_exit_trend(self, dataframe: pd.DataFrame, metadata: dict):
+        # Define exit signals
+        dataframe.loc[dataframe['rsi'] > 70, 'exit_long'] = 1
+        return dataframe
+```
+
+See [FreqTrade documentation](https://www.freqtrade.io/en/stable/strategy-customization/) for more details.
+
+#### Standalone FreqTrade Usage
+
+You can also use FreqTrade CLI directly with TradeAgent's config:
+
+```bash
+# Backtest a strategy
+freqtrade backtesting -c freqtrade_config/config.json --strategy SampleStrategy
+
+# Run FreqTrade standalone
+freqtrade trade -c freqtrade_config/config.json --strategy SampleStrategy
+```
+
+See `freqtrade_config/README.md` for more details.
+
 ### Creating Custom Strategies
 
 See [CLAUDE.md](CLAUDE.md) for development guide.

@@ -566,6 +566,195 @@ __all__ = [
 
 5. **Update documentation**
 
+### Integrating FreqTrade (Crypto Trading)
+
+TradeAgent supports two crypto trading implementations:
+
+#### 1. Custom CryptoBot (Default)
+- Located in `core/crypto_bot.py`
+- Uses strategies from `cryptobot/strategies/`
+- Lightweight and fully integrated
+
+#### 2. FreqTrade Integration (Optional)
+- Adapter located in `core/freqtrade_bot.py`
+- Uses strategies from `freqtrade_strategies/`
+- Battle-tested trading engine with 100+ exchanges
+
+#### Architecture
+
+```
+TradingEngine
+    ├─> crypto_bot (CryptoBot or FreqTradeBotAdapter)
+    ├─> portfolio_manager (shared)
+    ├─> risk_monitor (shared)
+    └─> notification_manager (shared)
+```
+
+Both implementations use the same:
+- Portfolio management (unified position tracking)
+- Risk management (same rules apply)
+- Notification system (same alerts)
+- Dashboard (same UI)
+
+#### Switching Between Implementations
+
+Configure in `config/trading.yaml`:
+
+```yaml
+# Use custom bot (default)
+crypto_bot_type: custom
+
+# Or use FreqTrade
+crypto_bot_type: freqtrade
+```
+
+The trading engine automatically instantiates the correct bot type:
+
+```python
+# In core/trading_engine.py
+crypto_bot_type = self.config.get('crypto_bot_type', 'custom').lower()
+
+if crypto_bot_type == 'freqtrade':
+    self.crypto_bot = FreqTradeBotAdapter(...)
+elif crypto_bot_type == 'custom':
+    self.crypto_bot = CryptoBot(...)
+```
+
+#### Creating FreqTrade Strategies
+
+Create strategies in `freqtrade_strategies/` following FreqTrade's IStrategy interface:
+
+```python
+from freqtrade.strategy import IStrategy
+import pandas as pd
+from pandas import DataFrame
+
+class MyFreqTradeStrategy(IStrategy):
+    """
+    Custom FreqTrade strategy for TradeAgent
+    """
+
+    # Required by FreqTrade
+    INTERFACE_VERSION = 3
+    timeframe = '5m'
+    stoploss = -0.02
+    minimal_roi = {"0": 0.04}
+
+    def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        """Add technical indicators"""
+        # Calculate RSI
+        delta = dataframe['close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        dataframe['rsi'] = 100 - (100 / (1 + rs))
+
+        # Add moving averages
+        dataframe['ema_20'] = dataframe['close'].ewm(span=20).mean()
+
+        return dataframe
+
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        """Define entry signals"""
+        # Enter when RSI < 30 (oversold)
+        dataframe.loc[
+            (dataframe['rsi'] < 30) &
+            (dataframe['close'] > dataframe['ema_20']),
+            'enter_long'
+        ] = 1
+
+        return dataframe
+
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        """Define exit signals"""
+        # Exit when RSI > 70 (overbought)
+        dataframe.loc[
+            dataframe['rsi'] > 70,
+            'exit_long'
+        ] = 1
+
+        return dataframe
+```
+
+#### Key Implementation Details
+
+**FreqTradeBotAdapter** (`core/freqtrade_bot.py`):
+- Implements same interface as CryptoBot (`execute_cycle()`)
+- Translates between FreqTrade and TradeAgent APIs
+- Enforces TradeAgent's risk rules on FreqTrade trades
+- Maps FreqTrade positions to TradeAgent portfolio
+
+**Key Methods:**
+```python
+class FreqTradeBotAdapter:
+    def execute_cycle(self):
+        """Main entry point - called by TradingEngine"""
+
+    def _check_symbol(self, symbol):
+        """Check symbol for entry/exit signals"""
+
+    def _check_entry(self, symbol, df, index, price):
+        """Check entry signal via FreqTrade strategy"""
+        # 1. Get FreqTrade strategy signal
+        # 2. Check TradeAgent risk rules
+        # 3. Open position in portfolio manager
+
+    def _check_exit(self, position, df, index, price):
+        """Check exit signal via FreqTrade strategy"""
+        # 1. Get FreqTrade strategy signal
+        # 2. Close position in portfolio manager
+```
+
+#### Testing FreqTrade Integration
+
+Run tests with:
+
+```bash
+# Run FreqTrade integration tests
+pytest tests/test_freqtrade_integration.py
+
+# Run all tests
+pytest tests/
+```
+
+Tests cover:
+- FreqTradeBotAdapter initialization
+- Strategy loading
+- Portfolio integration
+- Risk rule enforcement
+- Graceful fallback when FreqTrade not installed
+
+#### Configuration Files
+
+**FreqTrade Config** (`freqtrade_config/config.json`):
+- Standard FreqTrade configuration
+- Can be used with FreqTrade CLI or TradeAgent
+- Maps to TradeAgent settings
+
+**Trading Config** (`config/trading.yaml`):
+```yaml
+crypto_bot_type: freqtrade  # or 'custom'
+
+crypto:
+  exchange: binance
+  testnet: true
+  symbols:
+    - BTC/USDT
+    - ETH/USDT
+
+  # FreqTrade-specific settings
+  freqtrade_strategy: MyFreqTradeStrategy
+  freqtrade_strategy_path: freqtrade_strategies
+  freqtrade_config_file: freqtrade_config/config.json  # Optional
+```
+
+#### Resources
+
+- **FreqTrade Docs**: https://www.freqtrade.io/
+- **Strategy Customization**: https://www.freqtrade.io/en/stable/strategy-customization/
+- **TradeAgent FreqTrade Config**: `freqtrade_config/README.md`
+- **Example Strategy**: `freqtrade_strategies/sample_strategy.py`
+
 ### Adding a New Risk Metric
 
 **Location:** `shared/risk_management/risk_calculator.py`

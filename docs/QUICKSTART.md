@@ -43,6 +43,26 @@ This will install all required packages including:
 - requests (API calls)
 - pytest (testing)
 
+### 1.4 Optional: Install FreqTrade (For Advanced Crypto Trading)
+
+TradeAgent supports two crypto trading implementations:
+- **Custom CryptoBot** (default) - Lightweight, integrated, good for learning
+- **FreqTrade** (optional) - Battle-tested, 100+ exchanges, large community
+
+To use FreqTrade:
+
+```bash
+# Install FreqTrade and CCXT
+pip install freqtrade ccxt
+
+# Verify installation
+freqtrade --version
+```
+
+Then set `crypto_bot_type: freqtrade` in `config/trading.yaml` (see Step 2.4 below).
+
+**Note**: FreqTrade is optional. TradeAgent works great with the default Custom CryptoBot.
+
 ## Step 2: Configuration (5 minutes)
 
 ### 2.1 Create Environment File
@@ -97,7 +117,31 @@ TELEGRAM_CHAT_ID=your_chat_id
 3. Save bot token
 4. Get your chat ID from `https://api.telegram.org/bot<TOKEN>/getUpdates`
 
-### 2.4 Verify Configuration
+### 2.4 Optional: Configure FreqTrade
+
+If you installed FreqTrade (Step 1.4), you can enable it by editing `config/trading.yaml`:
+
+```yaml
+# Change this:
+crypto_bot_type: custom
+
+# To this:
+crypto_bot_type: freqtrade
+
+# And configure FreqTrade settings in the crypto section:
+crypto:
+  # ... other settings ...
+  freqtrade_strategy: SampleStrategy
+  freqtrade_strategy_path: freqtrade_strategies
+```
+
+Available strategies:
+- `SampleStrategy` - RSI-based strategy (included)
+- Add your own in `freqtrade_strategies/` directory
+
+**Note**: You can switch between `custom` and `freqtrade` anytime. Both use the same portfolio manager and risk rules.
+
+### 2.5 Verify Configuration
 
 ```bash
 python main.py config
