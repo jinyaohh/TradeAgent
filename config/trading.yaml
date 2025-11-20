@@ -13,6 +13,11 @@ initial_capital: 10000.0
 crypto_enabled: true   # Enable crypto trading bot
 stock_enabled: true    # Enable stock trading bot
 
+# Crypto Bot Type
+# - custom: Use TradeAgent's custom CryptoBot (lightweight, integrated)
+# - freqtrade: Use FreqTrade integration (requires: pip install freqtrade ccxt)
+crypto_bot_type: custom
+
 # Update Intervals (seconds)
 monitor_interval: 60    # Risk monitoring check interval
 crypto_interval: 300    # Crypto bot execution interval (5 minutes)
@@ -74,7 +79,7 @@ crypto:
     - ETH/USDT
     - BNB/USDT
 
-  # Strategy
+  # Strategy (for custom bot)
   strategy: rsi                   # Strategy to use (rsi, macd, etc.)
 
   # Strategy Parameters (RSI)
@@ -83,6 +88,11 @@ crypto:
   rsi_overbought: 70
   stop_loss_pct: 0.02            # 2% stop loss
   take_profit_pct: 0.04          # 4% take profit
+
+  # FreqTrade-specific settings (only used when crypto_bot_type: freqtrade)
+  freqtrade_strategy: SampleStrategy          # FreqTrade strategy name
+  freqtrade_strategy_path: freqtrade_strategies  # Path to FreqTrade strategies
+  freqtrade_config_file: freqtrade_config/config.json  # Optional: FreqTrade config file
 
 # Stock Bot Configuration
 stock:

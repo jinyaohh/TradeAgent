@@ -24,6 +24,15 @@ from monitoring.logger import get_logger
 from core.crypto_bot import CryptoBot
 from core.stock_bot import StockBot
 
+# Import FreqTrade adapter if available
+try:
+    from core.freqtrade_bot import FreqTradeBotAdapter
+    FREQTRADE_ADAPTER_AVAILABLE = True
+except ImportError:
+    FREQTRADE_ADAPTER_AVAILABLE = False
+    logger = get_logger(__name__)
+    logger.warning("FreqTrade adapter not available. Install with: pip install freqtrade ccxt")
+
 logger = get_logger(__name__)
 
 
@@ -117,13 +126,42 @@ class TradingEngine:
 
             # 4. Initialize trading bots
             if self.config.get('crypto_enabled', True):
-                self.crypto_bot = CryptoBot(
-                    self.portfolio_manager,
-                    self.risk_monitor,
-                    self.notification_manager,
-                    self.config.get('crypto', {})
-                )
-                logger.info("Crypto Bot initialized")
+                # Determine which crypto bot to use
+                crypto_bot_type = self.config.get('crypto_bot_type', 'custom').lower()
+
+                if crypto_bot_type == 'freqtrade':
+                    # Use FreqTrade adapter
+                    if not FREQTRADE_ADAPTER_AVAILABLE:
+                        logger.error(
+                            "FreqTrade bot selected but not available. "
+                            "Install with: pip install freqtrade ccxt"
+                        )
+                        raise ImportError("FreqTrade not installed")
+
+                    self.crypto_bot = FreqTradeBotAdapter(
+                        self.portfolio_manager,
+                        self.risk_monitor,
+                        self.notification_manager,
+                        self.config.get('crypto', {})
+                    )
+                    logger.info("Crypto Bot initialized (FreqTrade)")
+
+                elif crypto_bot_type == 'custom':
+                    # Use custom CryptoBot
+                    self.crypto_bot = CryptoBot(
+                        self.portfolio_manager,
+                        self.risk_monitor,
+                        self.notification_manager,
+                        self.config.get('crypto', {})
+                    )
+                    logger.info("Crypto Bot initialized (Custom)")
+
+                else:
+                    logger.error(f"Unknown crypto_bot_type: {crypto_bot_type}")
+                    raise ValueError(
+                        f"Invalid crypto_bot_type: {crypto_bot_type}. "
+                        "Must be 'custom' or 'freqtrade'"
+                    )
 
             if self.config.get('stock_enabled', True):
                 self.stock_bot = StockBot(
@@ -135,10 +173,15 @@ class TradingEngine:
                 logger.info("Stock Bot initialized")
 
             # Send startup notification
+            crypto_status = "Disabled"
+            if self.config.get('crypto_enabled', True):
+                bot_type = self.config.get('crypto_bot_type', 'custom').title()
+                crypto_status = f"Enabled ({bot_type})"
+
             self.notification_manager.notify(
                 title="🚀 Trading Engine Started",
                 message=f"Mode: {mode}\nInitial Capital: ${initial_capital:,.2f}\n"
-                       f"Crypto Bot: {'Enabled' if self.config.get('crypto_enabled', True) else 'Disabled'}\n"
+                       f"Crypto Bot: {crypto_status}\n"
                        f"Stock Bot: {'Enabled' if self.config.get('stock_enabled', True) else 'Disabled'}"
             )
 
